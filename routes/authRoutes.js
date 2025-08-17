@@ -1,0 +1,59 @@
+const express = require("express")
+const router = express.Router()
+const mongoose = require("mongoose")
+require("dotenv").config()
+
+mongoose.set("strictQuery", false)
+mongoose.connect(process.env.DATABASE).then(()=>{
+    console.log("connected to database")
+}).catch((error) => {
+    console.log("error connecting to database")
+})
+
+const User = require("../models/user")
+
+router.post("/register", async (req,res) => {
+    try{
+        const { username, password} = req.body
+
+        if(!username || !password ) {
+            return res.status(400).json({error: "Invalid input"})
+        }
+
+        const newUser = new User({username, password})
+        await newUser.save()
+        res.status(201).json({message:"User Created"})
+
+    } catch(error){
+        res.status(500).json({error: error.message})
+    }
+})
+
+router.post("/login", async (req,res) => {
+    try{
+        const {username, password} = req.body
+
+        if(!username || !password) {
+            return res.status(400).json({error: "Invalid input"})
+        }
+
+        const user = await User.findOne( {username} )
+    
+        if(!user){
+            return res.status(401).json({error : "incorrect username/password"})
+        }
+
+
+        const isPasswordMatch = await user.comparePassword(password)
+        if(!isPasswordMatch){
+            return res.status(401).json({error : "incorrect username/password"})
+        }else{
+            res.status(200).json({message: "user logged in"})
+        }
+
+    } catch(error){
+        res.status(500).json({error: "Server Error"})
+    }
+})
+
+module.exports = router
