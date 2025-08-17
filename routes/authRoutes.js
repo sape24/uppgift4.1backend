@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const mongoose = require("mongoose")
+const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
 mongoose.set("strictQuery", false)
@@ -48,7 +49,14 @@ router.post("/login", async (req,res) => {
         if(!isPasswordMatch){
             return res.status(401).json({error : "incorrect username/password"})
         }else{
-            res.status(200).json({message: "user logged in"})
+            const payload = {username:username}
+            const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn:'1h'})
+            const response = {
+                message: "user logged in",
+                token: token
+
+            }
+            res.status(200).json({response})
         }
 
     } catch(error){
