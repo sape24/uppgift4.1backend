@@ -5,15 +5,15 @@ const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
 mongoose.set("strictQuery", false)
-mongoose.connect(process.env.DATABASE).then(()=>{
+mongoose.connect(process.env.DATABASE).then(()=>{           //ansluter till databsen med hjälp av collectionstringen som finns i env
     console.log("connected to database")
 }).catch((error) => {
     console.log("error connecting to database")
 })
 
-const User = require("../models/user")
+const User = require("../models/user")                  //hämtar in user modellen som definierats i user.js
 
-router.post("/register", async (req,res) => {
+router.post("/register", async (req,res) => {          //post route för /register som hanterar registrering av nya användare
     try{
         const { username, password} = req.body
 
@@ -30,7 +30,7 @@ router.post("/register", async (req,res) => {
     }
 })
 
-router.post("/login", async (req,res) => {
+router.post("/login", async (req,res) => {          //post route för /login som hanterar inloggning av användare
     try{
         const {username, password} = req.body
 
@@ -49,8 +49,8 @@ router.post("/login", async (req,res) => {
         if(!isPasswordMatch){
             return res.status(401).json({error : "incorrect username/password"})
         }else{
-            const payload = {username:username}
-            const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn:'1h'})
+            const payload = {username:username}             //skapar ett payload objekt
+            const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn:'1h'})    //skapar en jwt token med den tidigare skapade payloaden och använder ens hemliga nyckel från env. Sätter giltighetstiden till 1 timme
             const response = {
                 message: "user logged in",
                 token: token
@@ -64,4 +64,4 @@ router.post("/login", async (req,res) => {
     }
 })
 
-module.exports = router
+module.exports = router            //exporterar router så att dom kan avnändas i server.js
