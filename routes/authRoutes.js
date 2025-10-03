@@ -49,7 +49,7 @@ router.post("/login", async (req,res) => {          //post route för /login som
         if(!isPasswordMatch){
             return res.status(401).json({error : "incorrect username/password"})
         }else{
-            const payload = {username:username}             //skapar ett payload objekt
+            const payload = {username:username, date: user.date}             //skapar ett payload objekt
             const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn:'1h'})    //skapar en jwt token med den tidigare skapade payloaden och använder ens hemliga nyckel från env. Sätter giltighetstiden till 1 timme
             const response = {
                 message: "user logged in",
